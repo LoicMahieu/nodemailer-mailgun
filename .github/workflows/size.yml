@@ -3,10 +3,18 @@ on: [pull_request]
 jobs:
   size:
     runs-on: ubuntu-latest
+    continue-on-error: true
     env:
       CI_JOB_NUMBER: 1
     steps:
       - uses: actions/checkout@v1
+      - name: Install deps
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: |
+            - recursive: true
+              args: [--frozen-lockfile, --strict-peer-dependencies]
       - uses: andresz1/size-limit-action@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}

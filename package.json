@@ -1,5 +1,5 @@
 {
-  "version": "0.1.0",
+  "version": "0.2.0",
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -11,18 +11,17 @@
     "node": ">=10"
   },
   "scripts": {
-    "start": "tsdx watch",
-    "build": "tsdx build",
-    "test": "tsdx test",
-    "lint": "tsdx lint",
-    "prepare": "tsdx build",
+    "start": "dts watch",
+    "build": "dts build",
+    "test": "dts test",
+    "lint": "dts lint",
+    "prepare": "dts build",
     "size": "size-limit",
     "analyze": "size-limit --why"
   },
-  "peerDependencies": {},
   "husky": {
     "hooks": {
-      "pre-commit": "tsdx lint"
+      "pre-commit": "dts lint"
     }
   },
   "prettier": {
@@ -47,16 +46,18 @@
   ],
   "devDependencies": {
     "@size-limit/preset-small-lib": "^7.0.8",
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.12.12",
     "@types/nodemailer": "^6.4.4",
+    "dts-cli": "^2.0.5",
     "husky": "^7.0.4",
     "nodemailer": "^6.7.3",
     "size-limit": "^7.0.8",
-    "tsdx": "^0.14.1",
     "tslib": "^2.3.1",
     "typescript": "^4.6.3"
   },
   "dependencies": {
     "form-data": "^4.0.0",
-    "mailgun.js": "^5.0.5"
+    "mailgun.js": "^10.2.1"
   }
 }

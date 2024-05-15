@@ -1,8 +1,7 @@
-import Mailgun from 'mailgun.js';
+import Mailgun, { CustomFile, MailgunMessageData } from 'mailgun.js';
 import formData from 'form-data';
 import { Transport, SendMailOptions } from 'nodemailer';
 import { Attachment } from 'nodemailer/lib/mailer';
-import { MailgunMessageData } from 'mailgun.js/interfaces/Messages';
 
 export interface MailgunTransportOptions {
   url?: string;
@@ -20,45 +19,46 @@ export interface MailgunTransportOptions {
       };
   timeout?: number;
 }
-export type MailgunTransportSendMailOptions = SendMailOptions & {
-  attachments?: MailAttachment;
+export type MailgunTransportSendMailOptions = Omit<
+  SendMailOptions,
+  'attachments'
+> & {
+  attachments?: MailAttachment[];
 };
 type MailAttachment = Attachment & {
   knownLength?: number;
 };
 
-const whitelist: (
-  | [string | RegExp, string | undefined]
-  | [string | RegExp]
-)[] = [
-  ['replyTo', 'h:Reply-To'],
-  ['messageId', 'h:Message-Id'],
-  [/^h:/],
-  [/^v:/],
-  ['from'],
-  ['to'],
-  ['cc'],
-  ['bcc'],
-  ['subject'],
-  ['text'],
-  ['template'],
-  ['html'],
-  ['attachment'],
-  ['inline'],
-  ['recipient-variables'],
-  ['o:tag'],
-  ['o:campaign'],
-  ['o:dkim'],
-  ['o:deliverytime'],
-  ['o:testmode'],
-  ['o:tracking'],
-  ['o:tracking-clicks'],
-  ['o:tracking-opens'],
-  ['o:require-tls'],
-  ['o:skip-verification'],
-  ['X-Mailgun-Variables'],
-  ['priority'],
-];
+const whitelist: ([string | RegExp, string | undefined] | [string | RegExp])[] =
+  [
+    ['replyTo', 'h:Reply-To'],
+    ['messageId', 'h:Message-Id'],
+    [/^h:/],
+    [/^v:/],
+    ['from'],
+    ['to'],
+    ['cc'],
+    ['bcc'],
+    ['subject'],
+    ['text'],
+    ['template'],
+    ['html'],
+    ['attachment'],
+    ['inline'],
+    ['recipient-variables'],
+    ['o:tag'],
+    ['o:campaign'],
+    ['o:dkim'],
+    ['o:deliverytime'],
+    ['o:testmode'],
+    ['o:tracking'],
+    ['o:tracking-clicks'],
+    ['o:tracking-opens'],
+    ['o:require-tls'],
+    ['o:skip-verification'],
+    ['X-Mailgun-Variables'],
+    ['priority'],
+  ];
 
 const applyKeyWhitelist = (mail: SendMailOptions): MailgunMessageData =>
   Object.keys(mail).reduce((acc, key) => {
@@ -87,8 +87,14 @@ const makeMailgunAttachments = (
       const data =
         typeof item.content === 'string'
           ? Buffer.from(item.content, item.encoding as BufferEncoding)
-          : item.content || item.path || undefined;
-      const attachment = {
+          : item.content || undefined;
+      if (!data) {
+        if (item.path) {
+          throw new Error('Mailgun does not support file paths');
+        }
+        return results;
+      }
+      const attachment: CustomFile = {
         data,
         filename: item.cid || item.filename || undefined,
         contentType: item.contentType || undefined,
@@ -100,7 +106,7 @@ const makeMailgunAttachments = (
         inlineAttachments.concat(item.cid ? attachment : []),
       ];
     },
-    [[] as MailAttachment[], [] as MailAttachment[]]
+    [[] as CustomFile[], [] as any[]]
   );
   return {
     ...(attachment.length ? { attachment } : {}),
@@ -112,7 +118,7 @@ const makeTextAddresses = (addresses: SendMailOptions['to']) => {
   const validAddresses = [
     ...(Array.isArray(addresses) ? addresses : [addresses]),
   ].filter(Boolean);
-  const textAddresses = validAddresses.map(item =>
+  const textAddresses = validAddresses.map((item) =>
     item && typeof item === 'object'
       ? item.name
         ? item.name + ' <' + item.address + '>'
@@ -125,7 +131,9 @@ const makeTextAddresses = (addresses: SendMailOptions['to']) => {
 };
 const makeAllTextAddresses = (
   mail: SendMailOptions
-): Pick<MailgunMessageData, 'from' | 'to' | 'cc' | 'bcc' | 'replyTo'> => ({
+): Pick<MailgunMessageData, 'from' | 'to' | 'cc' | 'bcc'> & {
+  replyTo?: string;
+} => ({
   ...mail,
   from: makeTextAddresses(mail.from),
   to: makeTextAddresses(mail.to),
@@ -157,14 +165,12 @@ const transport = (options: MailgunTransportOptions): Transport => {
     send: ({ data: mail }, callback) => {
       Promise.resolve()
         .then(async () => {
-          const {
-            priority,
-            ...whitelistedMail
-          }: MailgunMessageData = applyKeyWhitelist({
-            ...mail,
-            ...makeAllTextAddresses(mail),
-            ...makeMailgunAttachments(mail.attachments),
-          });
+          const { priority, ...whitelistedMail }: MailgunMessageData =
+            applyKeyWhitelist({
+              ...mail,
+              ...makeAllTextAddresses(mail),
+              ...makeMailgunAttachments(mail.attachments),
+            });
 
           const prioritisedMail: MailgunMessageData =
             priority === 'high'
@@ -189,8 +195,8 @@ const transport = (options: MailgunTransportOptions): Transport => {
           );
           return result;
         })
-        .then(result => callback(null, { ...result, messageId: result.id }))
-        .catch(error => callback(error, null));
+        .then((result) => callback(null, { ...result, messageId: result.id }))
+        .catch((error) => callback(error, null));
     },
     version: '1.0.0',
   };
