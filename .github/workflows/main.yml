@@ -23,6 +23,9 @@ jobs:
         uses: pnpm/action-setup@v4
         with:
           version: 9
+          run_install: |
+            - recursive: true
+              args: [--frozen-lockfile, --strict-peer-dependencies]
 
       - name: Lint
         run: npm run lint
