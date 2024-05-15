@@ -19,45 +19,46 @@ export interface MailgunTransportOptions {
       };
   timeout?: number;
 }
-export type MailgunTransportSendMailOptions = Omit<SendMailOptions, "attachments"> & {
+export type MailgunTransportSendMailOptions = Omit<
+  SendMailOptions,
+  'attachments'
+> & {
   attachments?: MailAttachment[];
 };
 type MailAttachment = Attachment & {
   knownLength?: number;
 };
 
-const whitelist: (
-  | [string | RegExp, string | undefined]
-  | [string | RegExp]
-)[] = [
-  ['replyTo', 'h:Reply-To'],
-  ['messageId', 'h:Message-Id'],
-  [/^h:/],
-  [/^v:/],
-  ['from'],
-  ['to'],
-  ['cc'],
-  ['bcc'],
-  ['subject'],
-  ['text'],
-  ['template'],
-  ['html'],
-  ['attachment'],
-  ['inline'],
-  ['recipient-variables'],
-  ['o:tag'],
-  ['o:campaign'],
-  ['o:dkim'],
-  ['o:deliverytime'],
-  ['o:testmode'],
-  ['o:tracking'],
-  ['o:tracking-clicks'],
-  ['o:tracking-opens'],
-  ['o:require-tls'],
-  ['o:skip-verification'],
-  ['X-Mailgun-Variables'],
-  ['priority'],
-];
+const whitelist: ([string | RegExp, string | undefined] | [string | RegExp])[] =
+  [
+    ['replyTo', 'h:Reply-To'],
+    ['messageId', 'h:Message-Id'],
+    [/^h:/],
+    [/^v:/],
+    ['from'],
+    ['to'],
+    ['cc'],
+    ['bcc'],
+    ['subject'],
+    ['text'],
+    ['template'],
+    ['html'],
+    ['attachment'],
+    ['inline'],
+    ['recipient-variables'],
+    ['o:tag'],
+    ['o:campaign'],
+    ['o:dkim'],
+    ['o:deliverytime'],
+    ['o:testmode'],
+    ['o:tracking'],
+    ['o:tracking-clicks'],
+    ['o:tracking-opens'],
+    ['o:require-tls'],
+    ['o:skip-verification'],
+    ['X-Mailgun-Variables'],
+    ['priority'],
+  ];
 
 const applyKeyWhitelist = (mail: SendMailOptions): MailgunMessageData =>
   Object.keys(mail).reduce((acc, key) => {
@@ -117,7 +118,7 @@ const makeTextAddresses = (addresses: SendMailOptions['to']) => {
   const validAddresses = [
     ...(Array.isArray(addresses) ? addresses : [addresses]),
   ].filter(Boolean);
-  const textAddresses = validAddresses.map(item =>
+  const textAddresses = validAddresses.map((item) =>
     item && typeof item === 'object'
       ? item.name
         ? item.name + ' <' + item.address + '>'
@@ -164,14 +165,12 @@ const transport = (options: MailgunTransportOptions): Transport => {
     send: ({ data: mail }, callback) => {
       Promise.resolve()
         .then(async () => {
-          const {
-            priority,
-            ...whitelistedMail
-          }: MailgunMessageData = applyKeyWhitelist({
-            ...mail,
-            ...makeAllTextAddresses(mail),
-            ...makeMailgunAttachments(mail.attachments),
-          });
+          const { priority, ...whitelistedMail }: MailgunMessageData =
+            applyKeyWhitelist({
+              ...mail,
+              ...makeAllTextAddresses(mail),
+              ...makeMailgunAttachments(mail.attachments),
+            });
 
           const prioritisedMail: MailgunMessageData =
             priority === 'high'
@@ -196,8 +195,8 @@ const transport = (options: MailgunTransportOptions): Transport => {
           );
           return result;
         })
-        .then(result => callback(null, { ...result, messageId: result.id }))
-        .catch(error => callback(error, null));
+        .then((result) => callback(null, { ...result, messageId: result.id }))
+        .catch((error) => callback(error, null));
     },
     version: '1.0.0',
   };
