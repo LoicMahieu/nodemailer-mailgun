@@ -178,7 +178,7 @@ describe('Mailgun transport', () => {
         text: 'Hello',
         attachments: [
           {
-            path: '/',
+            content: Buffer.from('Hello world!'),
             filename: 'CONTRIBUTORS.md',
             contentType: 'text/markdown',
             knownLength: 122,
@@ -192,7 +192,23 @@ describe('Mailgun transport', () => {
           "attachment": Array [
             Object {
               "contentType": "text/markdown",
-              "data": "/",
+              "data": Object {
+                "data": Array [
+                  72,
+                  101,
+                  108,
+                  108,
+                  111,
+                  32,
+                  119,
+                  111,
+                  114,
+                  108,
+                  100,
+                  33,
+                ],
+                "type": "Buffer",
+              },
               "filename": "CONTRIBUTORS.md",
               "knownLength": 122,
             },

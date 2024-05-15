@@ -1,8 +1,7 @@
-import Mailgun from 'mailgun.js';
+import Mailgun, { CustomFile, MailgunMessageData } from 'mailgun.js';
 import formData from 'form-data';
 import { Transport, SendMailOptions } from 'nodemailer';
 import { Attachment } from 'nodemailer/lib/mailer';
-import { MailgunMessageData } from 'mailgun.js/interfaces/Messages';
 
 export interface MailgunTransportOptions {
   url?: string;
@@ -20,8 +19,8 @@ export interface MailgunTransportOptions {
       };
   timeout?: number;
 }
-export type MailgunTransportSendMailOptions = SendMailOptions & {
-  attachments?: MailAttachment;
+export type MailgunTransportSendMailOptions = Omit<SendMailOptions, "attachments"> & {
+  attachments?: MailAttachment[];
 };
 type MailAttachment = Attachment & {
   knownLength?: number;
@@ -87,8 +86,14 @@ const makeMailgunAttachments = (
       const data =
         typeof item.content === 'string'
           ? Buffer.from(item.content, item.encoding as BufferEncoding)
-          : item.content || item.path || undefined;
-      const attachment = {
+          : item.content || undefined;
+      if (!data) {
+        if (item.path) {
+          throw new Error('Mailgun does not support file paths');
+        }
+        return results;
+      }
+      const attachment: CustomFile = {
         data,
         filename: item.cid || item.filename || undefined,
         contentType: item.contentType || undefined,
@@ -100,7 +105,7 @@ const makeMailgunAttachments = (
         inlineAttachments.concat(item.cid ? attachment : []),
       ];
     },
-    [[] as MailAttachment[], [] as MailAttachment[]]
+    [[] as CustomFile[], [] as any[]]
   );
   return {
     ...(attachment.length ? { attachment } : {}),
@@ -125,7 +130,9 @@ const makeTextAddresses = (addresses: SendMailOptions['to']) => {
 };
 const makeAllTextAddresses = (
   mail: SendMailOptions
-): Pick<MailgunMessageData, 'from' | 'to' | 'cc' | 'bcc' | 'replyTo'> => ({
+): Pick<MailgunMessageData, 'from' | 'to' | 'cc' | 'bcc'> & {
+  replyTo?: string;
+} => ({
   ...mail,
   from: makeTextAddresses(mail.from),
   to: makeTextAddresses(mail.to),
