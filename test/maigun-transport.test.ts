@@ -60,8 +60,8 @@ describe('Mailgun transport', () => {
         host: 'api.mailgun.com',
       })
     ).toMatchInlineSnapshot(`
-      Array [
-        Object {
+      [
+        {
           "key": "api-key",
           "timeout": undefined,
           "url": "https://api.mailgun.com/",
@@ -83,8 +83,8 @@ describe('Mailgun transport', () => {
         port: 8080,
       })
     ).toMatchInlineSnapshot(`
-      Array [
-        Object {
+      [
+        {
           "key": "api-key",
           "timeout": undefined,
           "url": "http://api.mailgun.com:8080/",
@@ -104,8 +104,8 @@ describe('Mailgun transport', () => {
         url: 'http://api.mailgun.com:8080',
       })
     ).toMatchInlineSnapshot(`
-      Array [
-        Object {
+      [
+        {
           "key": "api-key",
           "timeout": undefined,
           "url": "http://api.mailgun.com:8080",
@@ -142,9 +142,9 @@ describe('Mailgun transport', () => {
         } as any),
       })
     ).toMatchInlineSnapshot(`
-      Array [
+      [
         "bar",
-        Object {
+        {
           "bcc": "bcc@bar.com",
           "cc": "cc@bar.com",
           "from": "from@bar.com",
@@ -186,14 +186,14 @@ describe('Mailgun transport', () => {
         ],
       })
     ).toMatchInlineSnapshot(`
-      Array [
+      [
         "bar",
-        Object {
-          "attachment": Array [
-            Object {
+        {
+          "attachment": [
+            {
               "contentType": "text/markdown",
-              "data": Object {
-                "data": Array [
+              "data": {
+                "data": [
                   72,
                   101,
                   108,
@@ -238,15 +238,15 @@ describe('Mailgun transport', () => {
         ],
       })
     ).toMatchInlineSnapshot(`
-      Array [
+      [
         "bar",
-        Object {
+        {
           "from": "from@bar.com",
-          "inline": Array [
-            Object {
+          "inline": [
+            {
               "contentType": undefined,
-              "data": Object {
-                "data": Array [
+              "data": {
+                "data": [
                   104,
                   101,
                   108,
@@ -284,9 +284,9 @@ describe('Mailgun transport', () => {
         html: '<b>Hello</b>',
       })
     ).toMatchInlineSnapshot(`
-      Array [
+      [
         "bar",
-        Object {
+        {
           "from": "from@bar.com",
           "html": "<b>Hello</b>",
           "subject": "Subject",
@@ -309,9 +309,9 @@ describe('Mailgun transport', () => {
         },
       })
     ).toMatchInlineSnapshot(`
-      Array [
+      [
         "bar",
-        Object {
+        {
           "from": "from@bar.com",
           "subject": "Subject",
           "text": "Hello",
@@ -334,11 +334,11 @@ describe('Mailgun transport', () => {
         },
       })
     ).toMatchInlineSnapshot(`
-      Array [
+      [
         "bar",
-        Object {
+        {
           "from": "from@bar.com",
-          "h:X-Mailgun-Variables": "{\\"key\\":\\"boss\\"}",
+          "h:X-Mailgun-Variables": "{"key":"boss"}",
           "subject": "Subject",
           "template": "boss_door",
           "to": "to@bar.com",
@@ -358,9 +358,9 @@ describe('Mailgun transport', () => {
         text: 'Hello',
       })
     ).toMatchInlineSnapshot(`
-      Array [
+      [
         "bar",
-        Object {
+        {
           "bcc": "Bcc <bcc@bar.com>",
           "cc": "Cc <cc@bar.com>",
           "from": "From <from@bar.com>",
@@ -382,26 +382,29 @@ describe('Mailgun transport', () => {
           { address: 'to3@bar.com' } as any,
           { name: undefined, address: undefined },
         ],
+
         cc: [
           { name: 'Cc', address: 'cc@bar.com' },
           { name: null, address: 'cc2@bar.com' },
           { address: 'cc3@bar.com' } as any,
           { name: '', address: '' },
         ],
+
         bcc: [
           { name: 'Bcc', address: 'bcc@bar.com' },
           { name: null, address: 'bcc2@bar.com' },
           { address: 'bcc3@bar.com' } as any,
           { name: 'Bcc4' },
         ],
+
         replyTo: { name: 'ReplyTo', address: 'replyto@bar.com' },
         subject: 'Subject',
         text: 'Hello',
       })
     ).toMatchInlineSnapshot(`
-      Array [
+      [
         "bar",
-        Object {
+        {
           "bcc": "Bcc <bcc@bar.com>,bcc2@bar.com,bcc3@bar.com,Bcc4 <undefined>",
           "cc": "Cc <cc@bar.com>,cc2@bar.com,cc3@bar.com",
           "from": "from@bar.com",
@@ -424,9 +427,9 @@ describe('Mailgun transport', () => {
         text: 'Hello',
       })
     ).toMatchInlineSnapshot(`
-      Array [
+      [
         "bar",
-        Object {
+        {
           "from": "from@bar.com",
           "h:Reply-To": "replyto@bar.com",
           "subject": "Subject",
@@ -447,9 +450,9 @@ describe('Mailgun transport', () => {
         messageId: '<9e5cb9a0-852d-405c-8062-61886814e64c@samples.mailgun.org>',
       })
     ).toMatchInlineSnapshot(`
-      Array [
+      [
         "bar",
-        Object {
+        {
           "from": "from@bar.com",
           "h:Message-Id": "<9e5cb9a0-852d-405c-8062-61886814e64c@samples.mailgun.org>",
           "subject": "Subject",
@@ -470,9 +473,9 @@ describe('Mailgun transport', () => {
           priority: 'high',
         })
       ).toMatchInlineSnapshot(`
-        Array [
+        [
           "bar",
-          Object {
+          {
             "from": "from@bar.com",
             "h:Importance": "High",
             "h:X-MSMail-Priority": "High",
@@ -493,9 +496,9 @@ describe('Mailgun transport', () => {
           priority: 'low',
         })
       ).toMatchInlineSnapshot(`
-        Array [
+        [
           "bar",
-          Object {
+          {
             "from": "from@bar.com",
             "h:Importance": "Low",
             "h:X-MSMail-Priority": "Low",
@@ -516,9 +519,9 @@ describe('Mailgun transport', () => {
           priority: 'normal',
         })
       ).toMatchInlineSnapshot(`
-        Array [
+        [
           "bar",
-          Object {
+          {
             "from": "from@bar.com",
             "subject": "Subject",
             "to": "to@bar.com",
