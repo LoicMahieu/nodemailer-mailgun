@@ -1,7 +1,8 @@
-import Mailgun, { CustomFile, MailgunMessageData } from 'mailgun.js';
+import Mailgun from 'mailgun.js';
 import formData from 'form-data';
-import { Transport, SendMailOptions } from 'nodemailer';
-import { Attachment } from 'nodemailer/lib/mailer';
+import type { Transport, SendMailOptions } from 'nodemailer';
+import type { Attachment } from 'nodemailer/lib/mailer';
+import type { CustomFile, MailgunMessageData } from 'mailgun.js/Types/Messages/index.js';
 
 export interface MailgunTransportOptions {
   url?: string;
@@ -142,7 +143,7 @@ const makeAllTextAddresses = (
   replyTo: makeTextAddresses(mail.replyTo),
 });
 
-const transport = (options: MailgunTransportOptions): Transport => {
+export const getMailgunTransport = (options: MailgunTransportOptions): Transport => {
   const mailgun = new Mailgun(formData);
   let url = options.url;
   if (!options.url && options.host) {
@@ -201,5 +202,3 @@ const transport = (options: MailgunTransportOptions): Transport => {
     version: '1.0.0',
   };
 };
-
-export default transport;
